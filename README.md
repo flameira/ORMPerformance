@@ -54,4 +54,4 @@ ORDER BY [VehicleTypeId] ASC
 
 # Conclusions
 
-If the project is small with small amount of data, I suggest to use entity framework, but if the project can get a large amount of data It’s very clear [NPOCO](https://github.com/schotime/NPoco/wiki) we should use have the best test performance for more records results, at this moment is very easy to use and it 's possible to have the same functionalities have we have with entity framework, “includes”, exchange data directly from the object and for me the most important transactions.
+If the project is small with small amount of data, I suggest to use entity framework, but if the project can get a large amount of data It’s very clear [NPOCO](https://github.com/schotime/NPoco/wiki) we should use have the best test performance for more records results, at this moment is very easy to use and it 's possible to have the same functionalities like we have with entity framework, “includes,joins”, exchange data directly with the object and for me the most important transactions.
