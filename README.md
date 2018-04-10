@@ -1,6 +1,6 @@
 # ORMPerformance
 
-Solution to compare ORMS performance. NPOCO, EFCore,DAPPER and ADODBNET
+Solution to compare ORM performances. NPOCO, EFCore,DAPPER and ADODBNET
 This test example it's only to identify which ORM is the best solution to use in .net Core.
 This solution uses the "BenchMarkDonetNet" tool.
 
