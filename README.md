@@ -6,6 +6,10 @@ This solution uses the "BenchMarkDonetNet" tool.
 
 # First results
 With this test I try to use query with some complexity, join, filters and orders. 
+- Join 2 Tables
+- Order by Foreing Key
+- Filter by the join field id
+- Top 100
 
 ## 10 Records in the database
  ![
@@ -27,31 +31,51 @@ With this test I try to use query with some complexity, join, filters and orders
 The is the result for each query mady by the ORM, to prove the same sql query results .
 
 ## ADODB
+```css
+exec  sp_executesql  N'SELECT Top 100 CLH.Id, CLH.Description, CLH.CreatedDateTime, 
+CLH.UpdatedDateTime, CLH.IsObsolete, CLH.ObsoletedDateTime, CLH.CheckTypeId, CLH.IsSystem, 
+CLH.VehicleTypeId, CT.Id AS CT_Id, CT.CreatedDateTime AS CT_CreatedDateTime, 
+CT.UpdatedDateTime AS CT_UpdatedDateTime,CT.Name AS CT_Name, CT.IsSystem AS CT_IsSystem 
+from CheckListHeader CLH left join CheckType CT on CLH.CheckTypeId=Ct.Id 
+where CheckTypeId=@ID 
+order by VehicleTypeId asc',N'@ID int',@ID=1
+```
 
-exec  sp_executesql  N'SELECT Top 100 CLH.Id, CLH.Description, CLH.CreatedDateTime, CLH.UpdatedDateTime, CLH.IsObsolete, CLH.ObsoletedDateTime, CLH.CheckTypeId, CLH.IsSystem, CLH.VehicleTypeId, CT.Id AS CT_Id, CT.CreatedDateTime AS CT_CreatedDateTime, CT.UpdatedDateTime AS CT_UpdatedDateTime, CT.Name AS CT_Name, CT.IsSystem AS CT_IsSystem from CheckListHeader CLH left join CheckType CT on CLH.CheckTypeId=Ct.Id  where CheckTypeId=@ID order by VehicleTypeId asc',N'@ID int',@ID=1
-
-
-## Dapper
-
-SELECT Top 100 CLH.Id, CLH.Description, CLH.CreatedDateTime, CLH.UpdatedDateTime, CLH.IsObsolete, CLH.ObsoletedDateTime, CLH.CheckTypeId, CLH.IsSystem, CLH.VehicleTypeId, CT.Id AS CT_Id, CT.CreatedDateTime AS CT_CreatedDateTime, CT.UpdatedDateTime AS CT_UpdatedDateTime, CT.Name AS CT_Name, CT.IsSystem AS CT_IsSystem from CheckListHeader CLH left join CheckType CT on CLH.CheckTypeId=Ct.Id  where CheckTypeId=1 order by VehicleTypeId asc
-
-## Entity Framework
-
-exec sp_executesql N'SELECT TOP(@__p_1) [b].[Id], [b].[CheckTypeId], [b].[CreatedDateTime], [b].[Description], [b].[IsObsolete], [b].[IsSystem], [b].[UpdatedDateTime], [b].[VehicleTypeId], [b.CheckType].[Id], [b.CheckType].[CreatedDateTime], [b.CheckType].[IsSystem], [b.CheckType].[Name], [b.CheckType].[UpdatedDateTime]
+## [Dapper](https://github.com/StackExchange/Dapper)
+```css
+SELECT Top 100 CLH.Id, CLH.Description, CLH.CreatedDateTime, CLH.UpdatedDateTime, 
+CLH.IsObsolete, CLH.ObsoletedDateTime,CLH.CheckTypeId, CLH.IsSystem, 
+CLH.VehicleTypeId, CT.Id AS CT_Id, CT.CreatedDateTime AS CT_CreatedDateTime,
+CT.UpdatedDateTime AS CT_UpdatedDateTime, CT.Name AS CT_Name, CT.IsSystem AS CT_IsSystem
+from CheckListHeader CLH left join CheckType CT on CLH.CheckTypeId=Ct.Id  
+where CheckTypeId=1 order by VehicleTypeId asc
+```
+## Entity Framework 
+```css
+exec sp_executesql N'SELECT TOP(@__p_1) [b].[Id], [b].[CheckTypeId], [b].[CreatedDateTime],
+[b].[Description], [b].[IsObsolete], [b].[IsSystem], [b].[UpdatedDateTime], [b].[VehicleTypeId], 
+[b.CheckType].[Id], [b.CheckType].[CreatedDateTime], [b.CheckType].[IsSystem], 
+[b.CheckType].[Name], [b.CheckType].[UpdatedDateTime]
 FROM [CheckListHeader] AS [b]
 INNER JOIN [CheckType] AS [b.CheckType] ON [b].[CheckTypeId] = [b.CheckType].[Id]
 WHERE [b].[CheckTypeId] = @__CheckTypeId_0
 ORDER BY [b].[VehicleTypeId]',N'@__p_1 int,@__CheckTypeId_0 int',@__p_1=100,@__CheckTypeId_0=1
+```
 
-
-## NPOCO
-
-exec sp_executesql N'SELECT [CLH].[Description] as [Description], [CLH].[IsObsolete] as [IsObsolete], [CLH].[IsSystem] as [IsSystem], [CLH].[CheckTypeId] as [CheckTypeId], [CLH].[VehicleTypeId] as [VehicleTypeId], [CLH].[Id] as [Id], [CLH].[CreatedDateTime] as [CreatedDateTime], [CLH].[UpdatedDateTime] as [UpdatedDateTime], [CT].[Name] as [CheckType__Name], [CT].[IsSystem] as [CheckType__IsSystem], [CT].[Id] as [CheckType__Id], [CT].[CreatedDateTime] as [CheckType__CreatedDateTime], [CT].[UpdatedDateTime] as [CheckType__UpdatedDateTime] FROM [CheckListHeader] [CLH]
+## [NPOCO](https://github.com/schotime/NPoco/wiki)
+```css
+exec sp_executesql N'SELECT [CLH].[Description] as [Description], [CLH].[IsObsolete] as [IsObsolete],
+[CLH].[IsSystem] as [IsSystem], [CLH].[CheckTypeId] as [CheckTypeId], 
+[CLH].[VehicleTypeId] as [VehicleTypeId], [CLH].[Id] as [Id], [CLH].[CreatedDateTime] as [CreatedDateTime], 
+[CLH].[UpdatedDateTime] as [UpdatedDateTime], [CT].[Name] as [CheckType__Name], 
+[CT].[IsSystem] as [CheckType__IsSystem], [CT].[Id] as [CheckType__Id], 
+[CT].[CreatedDateTime] as [CheckType__CreatedDateTime], 
+[CT].[UpdatedDateTime] as [CheckType__UpdatedDateTime] FROM [CheckListHeader] [CLH]
 LEFT JOIN [CheckType] [CT] ON [CLH].[CheckTypeId] = [CT].[Id]
 WHERE ([CLH].[CheckTypeId] = @0)
 ORDER BY [VehicleTypeId] ASC
-
+```
 
 # Conclusions
 
-If the project is small with small amount of data, I suggest to use entity framework, but if the project can get a large amount of data It’s very clear [NPOCO](https://github.com/schotime/NPoco/wiki) we should use have the best test performance for more records results, at this moment is very easy to use and it 's possible to have the same functionalities like we have with entity framework, “includes,joins”, exchange data directly with the object and for me the most important transactions.
+If the project is small with small amount of data, I suggest to use entity framework, but if the project can get a large amount of data It’s very clear [NPOCO](https://github.com/schotime/NPoco/wiki) we should use have the best test performance for more records results, at this moment is very easy to use and it 's possible to have the same functionalities like we have with entity framework, “includes,joins”, exchange data directly with the object using LINQ and for me the most relevant **SQL Transaction Support.**
