@@ -55,6 +55,17 @@ The is the result for each query mady by the ORM, to prove the same sql query re
 ## ADODB
 
 ```css
+SqlDataAdapter("SELECT Top 1000 CLH.Id, CLH.Description, CLH.CreatedDateTime, CLH.UpdatedDateTime, 
+CLH.IsObsolete, CLH.ObsoletedDateTime, CLH.CheckTypeId, CLH.IsSystem, CLH.VehicleTypeId, 
+CT.Id AS CT_Id,CT.CreatedDateTime AS CT_CreatedDateTime, CT.UpdatedDateTime AS CT_UpdatedDateTime, 
+CT.Name AS CT_Name, CT.IsSystem AS CT_IsSystem 
+from CheckListHeader CLH 
+left join CheckType CT on CLH.CheckTypeId=Ct.Id 
+where CheckTypeId=@ID order by VehicleTypeId asc",conn)
+```
+
+
+```css
 exec  sp_executesql  N'SELECT Top 100 CLH.Id, CLH.Description, CLH.CreatedDateTime, 
 CLH.UpdatedDateTime, CLH.IsObsolete, CLH.ObsoletedDateTime, CLH.CheckTypeId, CLH.IsSystem, 
 CLH.VehicleTypeId, CT.Id AS CT_Id, CT.CreatedDateTime AS CT_CreatedDateTime, 
@@ -66,6 +77,17 @@ order by VehicleTypeId asc',N'@ID int',@ID=1
 
 ## [Dapper](https://github.com/StackExchange/Dapper) V(1.50.4)
 
+```css
+db.Query<CheckListHeaderADODB>(
+$"SELECT Top 1000 CLH.Id, CLH.Description, CLH.CreatedDateTime, CLH.UpdatedDateTime, 
+CLH.IsObsolete, CLH.ObsoletedDateTime, CLH.CheckTypeId, CLH.IsSystem, CLH.VehicleTypeId,
+CT.Id AS CT_Id,CT.CreatedDateTime AS CT_CreatedDateTime, CT.UpdatedDateTime AS CT_UpdatedDateTime,
+CT.Name AS CT_Name, CT.IsSystem AS CT_IsSystem 
+from CheckListHeader CLH 
+left join CheckType CT on CLH.CheckTypeId=Ct.Id 
+where CheckTypeId={checkTypeId} order by VehicleTypeId asc")
+.ToList()
+```
 
 ```css
 SELECT Top 100 CLH.Id, CLH.Description, CLH.CreatedDateTime, CLH.UpdatedDateTime, 
@@ -79,9 +101,9 @@ where CheckTypeId=1 order by VehicleTypeId asc
 
 ```css
 db.CheckListHeader
-				                  .Where(b => b.CheckTypeId == CheckTypeId)
-				                  .OrderBy(b => b.VehicleTypeId)
-				                  .Include(p => p.CheckType).Take(10);
+.Where(b => b.CheckTypeId == CheckTypeId)
+.OrderBy(b => b.VehicleTypeId)
+.Include(p => p.CheckType).Take(10);
 ```
 
 ```css
@@ -99,10 +121,10 @@ ORDER BY [b].[VehicleTypeId]',N'@__p_1 int,@__CheckTypeId_0 int',@__p_1=100,@__C
 
 ```css
 db.Query<CheckListHeader>()
-				                   .Include(m => m.CheckType)
-				                   .Where(m => m.CheckTypeId == CheckTypeId)
-				                   .OrderBy(m => m.VehicleTypeId)
-				                   .Limit(10);
+.Include(m => m.CheckType)
+.Where(m => m.CheckTypeId == CheckTypeId)
+.OrderBy(m => m.VehicleTypeId)
+.Limit(10);
 ```
 
 ```css
