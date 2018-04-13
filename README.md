@@ -2,10 +2,11 @@
 
 Solution to compare ORM performances. NPOCO, EFCore,DAPPER and ADODBNET
 The test example it's only to identify which ORM is the best solution to use in .net Core2.
-This solution uses the "BenchMarkDonetNet" tool.
+This solution uses the "BenchMarkDonetNet V(0.10.14)" tool.
 
 # First results
-With this test I try to use query with some complexity, join, filters and orders. 
+With this test I try to use query with some complexity, join, filters and orders.
+eg: 
 - Join 2 Tables
 - Order by Foreing Key
 - Filter by the join field id
@@ -39,7 +40,7 @@ With this test I try to use query with some complexity, join, filters and orders
 ***In progresss
 
 ## 100 000 Records in the database take the first 100
-![enter image description here](https://lh3.googleusercontent.com/OXv-IarA9kFfUGB_XVeFgQhzEll4hGLU26b0XIaLW7DBCZPuBaUEimIjnL_E9SnR-L7TpBh20NfyEQ "100")
+![enter image description here](https://photos.app.goo.gl/6gfk0ogvectUKPdo2 "100")
 
 ## 100 000 Records in the database take the first 500
 
@@ -57,6 +58,7 @@ With this test I try to use query with some complexity, join, filters and orders
 The is the result for each query mady by the ORM, to prove the same sql query results .
 
 ## ADODB
+
 ```css
 exec  sp_executesql  N'SELECT Top 100 CLH.Id, CLH.Description, CLH.CreatedDateTime, 
 CLH.UpdatedDateTime, CLH.IsObsolete, CLH.ObsoletedDateTime, CLH.CheckTypeId, CLH.IsSystem, 
@@ -67,7 +69,9 @@ where CheckTypeId=@ID
 order by VehicleTypeId asc',N'@ID int',@ID=1
 ```
 
-## [Dapper](https://github.com/StackExchange/Dapper)
+## [Dapper](https://github.com/StackExchange/Dapper) V(1.50.4)
+
+
 ```css
 SELECT Top 100 CLH.Id, CLH.Description, CLH.CreatedDateTime, CLH.UpdatedDateTime, 
 CLH.IsObsolete, CLH.ObsoletedDateTime,CLH.CheckTypeId, CLH.IsSystem, 
@@ -76,7 +80,15 @@ CT.UpdatedDateTime AS CT_UpdatedDateTime, CT.Name AS CT_Name, CT.IsSystem AS CT_
 from CheckListHeader CLH left join CheckType CT on CLH.CheckTypeId=Ct.Id  
 where CheckTypeId=1 order by VehicleTypeId asc
 ```
-## Entity Framework 
+## Entity Framework V(2.1.0-preview2-final)
+
+```css
+db.CheckListHeader
+				                  .Where(b => b.CheckTypeId == CheckTypeId)
+				                  .OrderBy(b => b.VehicleTypeId)
+				                  .Include(p => p.CheckType).Take(10);
+```
+
 ```css
 exec sp_executesql N'SELECT TOP(@__p_1) [b].[Id], [b].[CheckTypeId], [b].[CreatedDateTime],
 [b].[Description], [b].[IsObsolete], [b].[IsSystem], [b].[UpdatedDateTime], [b].[VehicleTypeId], 
@@ -88,7 +100,16 @@ WHERE [b].[CheckTypeId] = @__CheckTypeId_0
 ORDER BY [b].[VehicleTypeId]',N'@__p_1 int,@__CheckTypeId_0 int',@__p_1=100,@__CheckTypeId_0=1
 ```
 
-## [NPOCO](https://github.com/schotime/NPoco/wiki)
+## [NPOCO](https://github.com/schotime/NPoco/wiki) V(3.9.3)
+
+```css
+db.Query<CheckListHeader>()
+				                   .Include(m => m.CheckType)
+				                   .Where(m => m.CheckTypeId == CheckTypeId)
+				                   .OrderBy(m => m.VehicleTypeId)
+				                   .Limit(10);
+```
+
 ```css
 exec sp_executesql N'SELECT [CLH].[Description] as [Description], [CLH].[IsObsolete] as [IsObsolete],
 [CLH].[IsSystem] as [IsSystem], [CLH].[CheckTypeId] as [CheckTypeId], 
